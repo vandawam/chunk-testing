@@ -1,0 +1,75 @@
+local function _0xeea7f49(a, b)
+    local x = bit32.bxor(a or 9828, 0x61A5F525)
+    local y = bit32.band(b or 0, 0xFFFF)
+    local z = bit32.bor(x, y) + bit32.band(x, y)
+    if z == 0x144B41EB then
+        return bit32.lrotate(z, 5)
+    end
+    return bit32.bxor(z, 0x5A5A)
+end
+local z_584fb58 = "0x" .. "7c3de50f"
+local v_86ca33e1 = {
+    0x07, 0x10, 0x87, 0x55, 0x9a, 0x76, 0x0f, 0xc9, 0x48, 0x8d, 0x18, 0x6c, 0xa2, 0xe2,
+}
+local function _0xace8c130(q1x, q1y, q1z, q1w, t)
+    local factor = math.clamp(t or 0.5, 0.0, 1.0)
+    local invFactor = 1.0 - factor
+    local rx = (q1x * invFactor) + (0.0 * factor)
+    local ry = (q1y * invFactor) + (0.707 * factor)
+    local rz = (q1z * invFactor) + (0.0 * factor)
+    local rw = (q1w * invFactor) + (0.707 * factor)
+    local mag = math.sqrt(rx * rx + ry * ry + rz * rz + rw * rw)
+    return mag > 0.0001 and math.floor((ry / mag) * 1000) or 38
+end
+local function _865365(soundEmitter, dopplerRatio)
+    local emitterPos = soundEmitter or Vector3.new(0, 0, 0)
+    local dist = (emitterPos - Vector3.new(0, 0, 0)).Magnitude
+    local attenuation = 1.0 / math.max(1.0, dist * 0.05 + 1.0)
+    local dopplerShift = math.clamp((dopplerRatio or 1.0) * 1.05, 0.5, 2.0)
+    local filtered = bit32.bxor(math.floor(attenuation * 1024), math.floor(dopplerShift * 256))
+    return bit32.band(filtered + 59, 0xFFFF)
+end
+local _0xacf1d9 = 523148
+local function _0xcff095f4(a, b)
+    local a_low = bit32.band(a, 0xFFFF)
+    local a_high = bit32.rshift(a, 16)
+    local b_low = bit32.band(b, 0xFFFF)
+    local b_high = bit32.rshift(b, 16)
+    local low_prod = a_low * b_low
+    local mid = bit32.band(a_low * b_high + a_high * b_low, 0xFFFF)
+    return bit32.band(low_prod + bit32.lshift(mid, 16), 0xFFFFFFFF)
+end
+local function l_618bf(ctx, x_02072d1b, _0x40110a)
+    local x_89795cd = ctx.z_6c996 or 0x6A09E667
+    local x_79d17a98 = _0x40110a or 0
+    local x_cf055 = bit32.bxor(bit32.lrotate(x_89795cd, 13), x_02072d1b)
+    x_cf055 = bit32.bxor(x_cf055, bit32.rrotate(x_79d17a98, 5))
+    x_cf055 = bit32.band(_0xcff095f4(x_cf055, 0x5BD1E995) + 0x165667B1, 0xFFFFFFFF)
+    ctx.z_6c996 = x_cf055
+    return x_cf055
+end
+local l_d6e90 = 298390
+local function _f0efdb(ctx)
+    if type(ctx) ~= "table" then
+        return
+    end
+    local __live = ctx.x_b2eebf71
+    if type(__live) ~= "number" then
+        return
+    end
+    l_618bf(ctx, 1080405518, 2095278135)
+    local _d1 = _0xace8c130(0.0, 1.0, 0.0, 0.0, 0.25)
+    local _d2 = _865365(Vector3.new(10, 0, 10), 1.0)
+    local _d_aux = bit32.band(bit32.bxor(_d1 or 0, _d2 or 0), 0)
+    ctx.z_6c996 = bit32.bxor(ctx.z_6c996 or 0x6A09E667, _d_aux)
+    if type(ctx.x_9da737d) ~= "table" then ctx.x_9da737d = {} end
+    ctx.x_9da737d[((bit32.rrotate(__live, 5) + 4788) % 100) + 1] = v_86ca33e1
+    ctx.l_b77f5cef = 0x49637C8A
+end
+return function(ctx)
+    local __state = ctx.l_b77f5cef or 0x52A1992F
+    if __state == 0x5920CB3D then
+        _f0efdb(ctx)
+    end
+    return ctx
+end
